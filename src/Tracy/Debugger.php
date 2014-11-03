@@ -70,6 +70,9 @@ class Debugger
 	/** @var array of callables specifies the functions that are automatically called after fatal error */
 	public static $onFatalError = array();
 
+	/** @var bool enable xdebug backtrace (if xdebug is present) */
+	public static $xdebugBacktrace = TRUE;
+
 	/** @var bool {@link Debugger::enable()} */
 	private static $enabled = FALSE;
 
@@ -282,8 +285,13 @@ class Debugger
 
 		$error = error_get_last();
 		if (in_array($error['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE), TRUE)) {
-			self::_exceptionHandler(Helpers::fixStack(new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line'])), FALSE);
+			$exception = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
 
+			if (self::$xdebugBacktrace) {
+				$exception = Helpers::fixStack($exception);
+			}
+
+			self::_exceptionHandler($exception, FALSE);
 		} elseif (!connection_aborted() && !self::$productionMode && self::isHtmlMode()) {
 			self::getBar()->render();
 		}
