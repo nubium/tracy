@@ -76,6 +76,9 @@ class Debugger
 	/** @var bool {@link Debugger::enable()} */
 	private static $enabled = FALSE;
 
+	/** @var bool {@link Debugger::enable()} */
+	public static $displayBar = NULL;
+
 	/********************* logging ****************d*g**/
 
 	/** @var ILogger */
@@ -292,7 +295,7 @@ class Debugger
 			}
 
 			self::_exceptionHandler($exception, FALSE);
-		} elseif (!connection_aborted() && !self::$productionMode && self::isHtmlMode()) {
+		} elseif (!connection_aborted() && !self::$productionMode && self::isHtmlMode() && self::$displayBar !== FALSE) {
 			self::getBar()->render();
 		}
 	}
